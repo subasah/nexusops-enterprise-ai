@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusOps | Enterprise AI Incident & Financial Remediation Platform</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <div class="logo-box">
+                <span class="logo-icon">⚡</span>
+                <div class="logo-text">
+                    <h1>NexusOps</h1>
+                    <span class="version-badge">v1.0.0 PROD</span>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span class="badge tag-purple">Applied AI Engine</span>
+                <span class="badge tag-blue">OpenTelemetry Traced</span>
+                <span class="badge tag-green">Zero-Cost Offline Simulator</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <a href="/docs" target="_blank" class="btn btn-secondary">OpenAPI Docs</a>
+            <button id="btnResetEnv" class="btn btn-outline" onclick="resetEnvironment()">Reset Sandbox State</button>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+        <button class="nav-tab active" onclick="switchTab('studio')">🎮 Interactive Agent Studio</button>
+        <button class="nav-tab" onclick="switchTab('tracing')">📊 Observability & Telemetry</button>
+        <button class="nav-tab" onclick="switchTab('evals')">🧪 Evals & Benchmark Suite</button>
+        <button class="nav-tab" onclick="switchTab('flywheel')">🔄 Post-Training & Modeling Flywheel</button>
+        <button class="nav-tab highlight" onclick="switchTab('architecture')">📖 Architecture & Recruiter Playbook</button>
+    </nav>
+
+    <main class="main-container">
+
+        <!-- TAB 1: STUDIO -->
+        <section id="tab-studio" class="tab-pane active">
+            <div class="studio-layout">
+                <!-- Left: Control Panel & Scenarios -->
+                <div class="panel control-panel">
+                    <div class="panel-header">
+                        <h2>Operational Scenarios</h2>
+                        <span class="hint">Select a real-world enterprise workflow</span>
+                    </div>
+
+                    <div class="scenario-grid">
+                        <div class="scenario-card" onclick="loadScenario(0)">
+                            <div class="sc-badge safe">Standard Dispute</div>
+                            <h3>Disputed VIP Invoice ($189.50)</h3>
+                            <p>Ticket TK-4401 invoice dispute. End-to-end multi-step lookup, refund, and ticket resolution.</p>
+                        </div>
+                        <div class="scenario-card" onclick="loadScenario(1)">
+                            <div class="sc-badge critical">Tier-3 Financial</div>
+                            <h3>High-Value Refund Gate ($1,450.00)</h3>
+                            <p>Exceeds auto-refund threshold ($200.00). Triggers cryptographic HITL challenge token.</p>
+                        </div>
+                        <div class="scenario-card" onclick="loadScenario(2)">
+                            <div class="sc-badge warn">Ambiguity Check</div>
+                            <h3>Ambiguous Refund Prompt</h3>
+                            <p>"Refund the customer please" without IDs. Agent prompts for clarification instead of guessing.</p>
+                        </div>
+                        <div class="scenario-card" onclick="loadScenario(3)">
+                            <div class="sc-badge danger">Adversarial Defense</div>
+                            <h3>Prompt Injection Attack</h3>
+                            <p>Jailbreak and system override attempt. Input guardrail intercepts and terminates safely.</p>
+                        </div>
+                        <div class="scenario-card" onclick="loadScenario(4)">
+                            <div class="sc-badge info">Infrastructure</div>
+                            <h3>Dead-Letter Queue Recovery</h3>
+                            <p>Dropped billing event in DLQ. Inspects failed webhook and replays event to Kafka/bus.</p>
+                        </div>
+                    </div>
+
+                    <div class="custom-prompt-section">
+                        <label for="promptInput"><strong>Task Prompt</strong> (or write your own operational command):</label>
+                        <textarea id="promptInput" rows="3" placeholder="Enter task instruction for NexusOps..."></textarea>
+                        <div class="prompt-actions">
+                            <button id="btnRunTask" class="btn btn-primary" onclick="runTask()">
+                                <span class="btn-icon">▶</span> Execute Agent Workflow
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Live Execution Feed -->
+                <div class="panel execution-panel">
+                    <div class="panel-header">
+                        <h2>Execution Trajectory</h2>
+                        <div id="statusContainer" class="status-container">
+                            <span id="agentStatusBadge" class="status-badge ready">READY</span>
+                        </div>
+                    </div>
+
+                    <div id="executionContent" class="execution-content">
+                        <div class="empty-state">
+                            <div class="empty-icon">🛰️</div>
+                            <h3>Ready for Mission Operations</h3>
+                            <p>Select a scenario or type a prompt above to watch NexusOps plan, inspect tools, enforce safety gates, and remediate incidents.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: TRACING & TELEMETRY -->
+        <section id="tab-tracing" class="tab-pane">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Distributed Tracing & OpenTelemetry Spans</h2>
+                    <span class="hint">High-resolution latency, token budgeting, and execution tree</span>
+                </div>
+
+                <div class="telemetry-kpis">
+                    <div class="kpi-card">
+                        <span class="kpi-label">Total Latency</span>
+                        <span id="kpiLatency" class="kpi-val">0.0 ms</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Prompt Tokens</span>
+                        <span id="kpiPromptTokens" class="kpi-val">0</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Completion Tokens</span>
+                        <span id="kpiCompTokens" class="kpi-val">0</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Total Cost</span>
+                        <span id="kpiCost" class="kpi-val">$0.000000</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Prompt Cache Hits</span>
+                        <span id="kpiCacheHits" class="kpi-val">0</span>
+                    </div>
+                </div>
+
+                <div class="traces-table-container">
+                    <h3>Execution Spans Waterfall</h3>
+                    <table class="data-table" id="spansTable">
+                        <thead>
+                            <tr>
+                                <th>Span ID</th>
+                                <th>Name</th>
+                                <th>Kind</th>
+                                <th>Duration (ms)</th>
+                                <th>Status</th>
+                                <th>Attributes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="spansTableBody">
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No trace active. Execute a task to view spans.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="compensation-section">
+                    <h3>SAGA Compensation & Rollback Ledger</h3>
+                    <p class="section-desc">Tracks registered reverse actions for mutations. If downstream steps fail, these roll back state in LIFO order.</p>
+                    <div id="compensationHistory" class="code-box">No rollbacks triggered yet. System in consistent state.</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: EVALS & BENCHMARKS -->
+        <section id="tab-evals" class="tab-pane">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Continuous Evaluation Harness</h2>
+                    <div>
+                        <button id="btnRunEvals" class="btn btn-primary" onclick="runBenchmarkSuite()">
+                            <span class="btn-icon">⚡</span> Run All 6 Benchmark Scenarios
+                        </button>
+                    </div>
+                </div>
+
+                <div class="eval-summary-cards" id="evalSummaryCards" style="display: none;">
+                    <div class="kpi-card highlight">
+                        <span class="kpi-label">Benchmark Pass Rate</span>
+                        <span id="evalPassRate" class="kpi-val">--%</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Avg Tool Precision</span>
+                        <span id="evalToolPrec" class="kpi-val">--</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Avg Tool Recall</span>
+                        <span id="evalToolRec" class="kpi-val">--</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Avg Grounding Score</span>
+                        <span id="evalGrounding" class="kpi-val">--</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Avg Latency</span>
+                        <span id="evalAvgLatency" class="kpi-val">-- ms</span>
+                    </div>
+                    <div class="kpi-card">
+                        <span class="kpi-label">Total Spend</span>
+                        <span id="evalTotalCost" class="kpi-val">$--</span>
+                    </div>
+                </div>
+
+                <div class="benchmark-table-container">
+                    <table class="data-table" id="evalResultsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Scenario Title</th>
+                                <th>Status Match</th>
+                                <th>Tool Precision</th>
+                                <th>Tool Recall</th>
+                                <th>Grounding Score</th>
+                                <th>Safety Compliant</th>
+                                <th>Latency</th>
+                                <th>Result</th>
+                            </tr>
+                        </thead>
+                        <tbody id="evalResultsBody">
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">Click "Run All 6 Benchmark Scenarios" to run deterministic evaluation suite.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 4: FLYWHEEL -->
+        <section id="tab-flywheel" class="tab-pane">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>Model Alignment & Post-Training Flywheel</h2>
+                    <span class="hint">How Applied AI Engineers partner with Modeling/Post-Training teams</span>
+                </div>
+
+                <div class="flywheel-grid">
+                    <div class="flywheel-card">
+                        <h3>1. Supervised Fine-Tuning (SFT) Gold Trajectories</h3>
+                        <p>Exports verified successful multi-step tool reasoning chains for dataset curation.</p>
+                        <button class="btn btn-outline btn-sm" onclick="loadSFTDataset()">Inspect SFT JSONL</button>
+                        <pre id="sftOutput" class="flywheel-preview">Click button to view exported SFT records...</pre>
+                    </div>
+
+                    <div class="flywheel-card">
+                        <h3>2. Direct Preference Optimization (DPO) Pairs</h3>
+                        <p>Generates (chosen vs rejected) trajectory pairs to train safety, threshold compliance, and anti-hallucination.</p>
+                        <button class="btn btn-outline btn-sm" onclick="loadDPODataset()">Inspect DPO Pairs</button>
+                        <pre id="dpoOutput" class="flywheel-preview">Click button to view exported DPO pairs...</pre>
+                    </div>
+                </div>
+
+                <div class="memo-container">
+                    <h3>3. Modeling Team Feedback Memo</h3>
+                    <p class="section-desc">Diagnostic report identifying model error modalities, schema compliance gaps, and reward model recommendations.</p>
+                    <div id="memoContent" class="code-box">Loading modeling feedback memo...</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 5: ARCHITECTURE & INTERVIEW PLAYBOOK -->
+        <section id="tab-architecture" class="tab-pane">
+            <div class="panel">
+                <div class="panel-header">
+                    <h2>System Architecture & Applied AI Interview Playbook</h2>
+                    <span class="hint">Frameworks, design tradeoffs, and STAR-format talking points for recruiters</span>
+                </div>
+
+                <div class="playbook-content">
+                    <article class="playbook-article">
+                        <h3>Executive Architecture Overview</h3>
+                        <p>
+                            NexusOps is designed to bridge frontier LLM capabilities with complex, mission-critical enterprise systems. 
+                            Rather than allowing an LLM unconstrained access to databases and payment processors, NexusOps surrounds the model with a 
+                            multi-tier <strong>Defense-in-Depth</strong> runtime:
+                        </p>
+
+                        <div class="arch-diagram-box">
+                            <div class="diagram-step">1. Input Guardrails (Injection & PII Sanitizer)</div>
+                            <div class="diagram-arrow">↓</div>
+                            <div class="diagram-step">2. Ambiguity & Entity Disambiguation Engine</div>
+                            <div class="diagram-arrow">↓</div>
+                            <div class="diagram-step">3. Pareto Model Router (Fast Triage vs Deep Reasoner + Semantic Cache)</div>
+                            <div class="diagram-arrow">↓</div>
+                            <div class="diagram-step">4. Tool Registry (Action Risk Tiers: Tier 1 Read, Tier 2 Reversible, Tier 3 Critical Financial)</div>
+                            <div class="diagram-arrow">↓</div>
+                            <div class="diagram-step">5. Cryptographic HITL Gatekeeper & SAGA Compensation Ledger</div>
+                            <div class="diagram-arrow">↓</div>
+                            <div class="diagram-step">6. Output Grounding Verifier & OpenTelemetry Tracing Pipeline</div>
+                            <div class="diagram-arrow">↓</div>
+                            <div class="diagram-step">7. Post-Training Flywheel (SFT & DPO Trajectory Exporters)</div>
+                        </div>
+
+                        <h3>The 4 Core Pillars of Integration & Production Craft</h3>
+                        <div class="pillars-accordion">
+                            <div class="pillar-box">
+                                <h4>Pillar 1: Robust Enterprise Systems & Tool Integration</h4>
+                                <ul>
+                                    <li><strong>ACID Relational Layer:</strong> SQLite/Postgres orders, invoices, and customer balances with explicit schema definitions.</li>
+                                    <li><strong>Payment Processor Simulator:</strong> Stripe-grade charge lookup, idempotent refunds, and dispute workflows.</li>
+                                    <li><strong>Action Risk Tiering:</strong> Automated classification of every tool call into Tier 1 (Read-Only), Tier 2 (Reversible Mutation), or Tier 3 (Critical Financial).</li>
+                                    <li><strong>Cryptographic HITL Gate:</strong> Irreversible or high-value mutations (> $200) pause execution and require HMAC challenge signatures.</li>
+                                </ul>
+                            </div>
+
+                            <div class="pillar-box">
+                                <h4>Pillar 2: Production Engineering & Architecture Tradeoffs</h4>
+                                <ul>
+                                    <li><strong>Pareto Frontier Routing:</strong> Balances Quality, Latency, Cost, and Model Risk. Routes classification/triage to cheap/fast models and complex synthesis to deep reasoning models.</li>
+                                    <li><strong>Circuit Breaker & Fallback:</strong> If primary model encounters timeouts or 503 errors, circuit trips open and cascades to backup provider automatically.</li>
+                                    <li><strong>Semantic & Exact Cache:</strong> Hashes message context to eliminate redundant expensive LLM calls (100% cost reduction on repeated requests).</li>
+                                    <li><strong>SAGA Compensation Ledger:</strong> Tracks reversible actions; if step 4 fails, prior steps (1, 2, 3) are automatically compensated in LIFO order.</li>
+                                </ul>
+                            </div>
+
+                            <div class="pillar-box">
+                                <h4>Pillar 3: Partnering with Modeling & Post-Training via Evals</h4>
+                                <ul>
+                                    <li><strong>Deterministic Benchmark Suite:</strong> 6 isolated scenarios covering tool accuracy, prompt injection, HITL triggers, and DLQ recovery.</li>
+                                    <li><strong>Quantitative Metrics:</strong> Tool Precision/Recall, Grounding Score, Safety Adherence, and Token Budgeting.</li>
+                                    <li><strong>SFT & DPO Flywheel:</strong> Automatically formats successful runs into SFT training datasets and synthesizes DPO preference pairs for RLHF/post-training alignment.</li>
+                                </ul>
+                            </div>
+
+                            <div class="pillar-box">
+                                <h4>Pillar 4: Translating Ambiguous Workflows into Robust Reusable AI Patterns</h4>
+                                <ul>
+                                    <li><strong>Ambiguity Disambiguation Protocol:</strong> Detects vague operational requests (e.g., "refund the customer") and prompts for target entities instead of hallucinating.</li>
+                                    <li><strong>ReAct + Self-Reflection Loop:</strong> Decomposes complex enterprise incidents into step-by-step verified milestones.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h3>Recruiter & Hiring Manager Interview Cheatsheet</h3>
+                        <div class="qa-box">
+                            <div class="qa-item">
+                                <h4>Q: "How do you prevent an AI agent from causing catastrophic financial loss or data corruption in production?"</h4>
+                                <p><strong>Talking Points:</strong> "I implement an Action Risk Tiering framework combined with cryptographic Human-In-The-Loop (HITL) gating. In NexusOps, tools are segregated into Tier 1 (Read-Only), Tier 2 (Reversible Mutation), and Tier 3 (Critical Financial). Any action exceeding configured thresholds (e.g. refunds > $200 or database mutations) cannot execute autonomously: the runtime generates an HMAC challenge token, pauses execution state, and requires an authorized operator signature. Furthermore, for reversible multi-step workflows, I implement a SAGA compensation ledger that executes LIFO rollbacks if any downstream step fails."</p>
+                            </div>
+
+                            <div class="qa-item">
+                                <h4>Q: "How do you partner with post-training and modeling engineers to improve model behavior?"</h4>
+                                <p><strong>Talking Points:</strong> "Applied AI engineering is a continuous feedback flywheel with modeling. I don't just prompt-engineer; I build automated evaluation harnesses that quantitatively measure Tool Selection Precision/Recall and Grounding Fidelity. Trajectories from production and benchmark runs are logged into structured JSONL format and partitioned into SFT demonstration datasets (for gold reasoning trajectories) and DPO pairs (contrasting grounded vs. hallucinated runs). I deliver structured alignment memos to post-training teams highlighting specific failure modes (e.g. schema parameter drift or premature execution) so they can tune reward models or adjust RLHF curriculum."</p>
+                            </div>
+
+                            <div class="qa-item">
+                                <h4>Q: "How do you make architectural decisions balancing Quality, Latency, Cost, and Safety?"</h4>
+                                <p><strong>Talking Points:</strong> "I use a Pareto Frontier routing layer. Using high-cost reasoning models for every turn blows the token budget and introduces high latency SLAs. I route initial ambiguity checks and triage to sub-100ms fast models, reserving deep reasoning models for complex multi-tool synthesis. Additionally, I deploy an exact-hash and semantic cache with TTL to eliminate redundant calls, and implement circuit breakers with cascading fallbacks to protect against provider outages."</p>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
